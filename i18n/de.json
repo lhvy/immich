@@ -2193,7 +2193,7 @@
   "upload_status_errors": "Fehler",
   "upload_status_uploaded": "Hochgeladen",
   "upload_success": "Hochladen erfolgreich. Aktualisiere die Seite, um neue hochgeladene Dateien zu sehen.",
-  "upload_to_album_body": "Für Nutzer*innen die nicht den manuellen Upload verwenden, du kannst auswählen neue lokale Fotos direkt in ein Album hinzufügen, sodass du sie nicht erst hochladen und dann zu einem Album hinzufügen musst.",
+  "upload_to_album_body": "Für Nutzer, die die manuelle Upload-Funktion nicht verwenden, können lokale Fotos jetzt direkt beim Hochladen einem Album hinzugefügt werden. Ein nachträgliches Hinzufügen zum Album ist nicht mehr nötig.",
   "upload_to_album_title": "Direkt in ein Album hochladen",
   "upload_to_immich": "Auf Immich hochladen ({count})",
   "uploading": "Wird hochgeladen",

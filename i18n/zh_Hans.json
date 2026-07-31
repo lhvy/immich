@@ -1950,7 +1950,7 @@
   "shared_link_create_error": "创建共享链接出错",
   "shared_link_custom_url_description": "使用自定义URL访问此共享链接",
   "shared_link_custom_url_title": "自定义 URL",
-  "shared_link_custom_url_warning": "注意:带有正斜杠的自定义URL名称可能不会像您预期的那样运行。",
+  "shared_link_custom_url_warning": "警告：自定义URL名称中的正斜杠 / 可能导致预期之外的行为。",
   "shared_link_edit_description_hint": "编辑共享描述",
   "shared_link_edit_expire_after_option_day": "1天",
   "shared_link_edit_expire_after_option_days": "{count}天",
