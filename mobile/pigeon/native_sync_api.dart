@@ -133,6 +133,18 @@ abstract class NativeSyncApi {
 
   void cancelHashing();
 
+  @async
+  bool hasMediaLocationPermission();
+
+  @async
+  String? hashAssetCurrent(String assetId);
+
+  @async
+  String? hashAssetOriginal(String assetId);
+
+  @async
+  String? hashAssetFile(String assetId);
+
   void cancelSync();
 
   @TaskQueue(type: TaskQueueType.serialBackgroundThread)

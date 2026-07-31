@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/constants/enums.dart';
 import 'package:immich_mobile/domain/models/album/album.model.dart';
 import 'package:immich_mobile/presentation/actions/action.widget.dart';
+import 'package:immich_mobile/presentation/actions/asset_debug.action.dart';
 import 'package:immich_mobile/presentation/actions/favorite.action.dart';
 import 'package:immich_mobile/presentation/widgets/action_buttons/archive_action_button.widget.dart';
 import 'package:immich_mobile/presentation/widgets/action_buttons/bulk_tag_assets_action_button.widget.dart';
@@ -88,6 +89,7 @@ class _GeneralBottomSheetState extends ConsumerState<GeneralBottomSheet> {
       maxChildSize: 0.85,
       shouldCloseOnMinExtent: false,
       actions: [
+        const ActionColumnButton(action: AssetDebugAction(source: .timeline)),
         const ActionColumnButton(action: FavoriteAction(source: .timeline)),
         const ShareActionButton(source: ActionSource.timeline),
         if (multiselect.hasRemote) ...[

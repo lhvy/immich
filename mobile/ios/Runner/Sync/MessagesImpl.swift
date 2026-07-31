@@ -355,7 +355,23 @@ class NativeSyncApiImpl: ImmichPlugin, NativeSyncApi, FlutterPlugin {
     hashTask?.cancel()
     hashTask = nil
   }
-  
+
+  func hasMediaLocationPermission(completion: @escaping (Result<Bool, Error>) -> Void) {
+    completion(.success(false))
+  }
+
+  func hashAssetCurrent(assetId: String, completion: @escaping (Result<String?, Error>) -> Void) {
+    completion(.success(nil))
+  }
+
+  func hashAssetOriginal(assetId: String, completion: @escaping (Result<String?, Error>) -> Void) {
+    completion(.success(nil))
+  }
+
+  func hashAssetFile(assetId: String, completion: @escaping (Result<String?, Error>) -> Void) {
+    completion(.success(nil))
+  }
+
   func cancelSync() {
     syncTask?.cancel()
     syncTask = nil

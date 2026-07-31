@@ -8,6 +8,7 @@ import 'package:immich_mobile/domain/models/asset/base_asset.model.dart';
 import 'package:immich_mobile/domain/models/exif.model.dart';
 import 'package:immich_mobile/extensions/platform_extensions.dart';
 import 'package:immich_mobile/providers/infrastructure/asset.provider.dart';
+import 'package:immich_mobile/routing/router.dart';
 
 @RoutePage()
 class AssetTroubleshootPage extends ConsumerWidget {
@@ -36,10 +37,23 @@ class _AssetDetailsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final localAssetId = switch (asset) {
+      LocalAsset(:final id) => id,
+      RemoteAsset(:final localId) => localId,
+    };
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _AssetPropertiesSection(asset: asset),
+        if (localAssetId != null) ...[
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.bug_report_outlined),
+            label: const Text('Debug Hash'),
+            onPressed: () => unawaited(context.pushRoute(AssetHashDiagnosticsRoute(localAssetId: localAssetId))),
+          ),
+        ],
         const SizedBox(height: 16),
         Text(
           'matching_assets'.tr(),

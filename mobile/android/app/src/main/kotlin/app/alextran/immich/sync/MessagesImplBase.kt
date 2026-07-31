@@ -1,8 +1,10 @@
 package app.alextran.immich.sync
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.io.File
+import java.io.FileInputStream
 import java.io.InputStream
 import java.security.MessageDigest
 import kotlin.coroutines.cancellation.CancellationException
@@ -498,6 +501,71 @@ open class NativeSyncApiImplBase(context: Context) : ImmichPlugin(), ActivityAwa
         MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
       }
     } ?: MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+
+  fun hasMediaLocationPermission(callback: (Result<Boolean>) -> Unit) {
+    val granted = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
+      ctx.checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION) == PackageManager.PERMISSION_GRANTED
+    callback(Result.success(granted))
+  }
+
+  fun hashAssetCurrent(assetId: String, callback: (Result<String?>) -> Unit) {
+    hashStream(callback) { ctx.contentResolver.openInputStream(assetUri(assetId)) }
+  }
+
+  fun hashAssetOriginal(assetId: String, callback: (Result<String?>) -> Unit) {
+    hashStream(callback) {
+      val uri = assetUri(assetId)
+      val original = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        MediaStore.setRequireOriginal(uri)
+      } else {
+        uri
+      }
+      ctx.contentResolver.openInputStream(original)
+    }
+  }
+
+  fun hashAssetFile(assetId: String, callback: (Result<String?>) -> Unit) {
+    hashStream(callback) { dataPath(assetId)?.let { FileInputStream(File(it)) } }
+  }
+
+  private fun assetUri(assetId: String): Uri = ContentUris.withAppendedId(
+    MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL),
+    assetId.toLong()
+  )
+
+  private fun dataPath(assetId: String): String? = getCursor(
+    MediaStore.VOLUME_EXTERNAL,
+    "${MediaStore.MediaColumns._ID} = ?",
+    arrayOf(assetId),
+    arrayOf(MediaStore.MediaColumns.DATA)
+  )?.use { cursor ->
+    if (cursor.moveToFirst()) cursor.getStringOrNull(0) else null
+  }
+
+  private fun hashStream(callback: (Result<String?>) -> Unit, open: () -> InputStream?) {
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val stream = open()
+        if (stream == null) {
+          completeWhenActive(callback, Result.success(null))
+          return@launch
+        }
+
+        val digest = MessageDigest.getInstance("SHA-1")
+        stream.use { input ->
+          val buffer = ByteArray(HASH_BUFFER_SIZE)
+          while (true) {
+            val read = input.read(buffer)
+            if (read < 0) break
+            digest.update(buffer, 0, read)
+          }
+        }
+        completeWhenActive(callback, Result.success(Base64.encodeToString(digest.digest(), Base64.NO_WRAP)))
+      } catch (e: Exception) {
+        completeWhenActive(callback, Result.failure(e))
+      }
+    }
+  }
 
   fun cancelHashing() {
     hashTask?.cancel()
